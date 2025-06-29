@@ -19,8 +19,13 @@ const Navbar = () => {
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
-    if (tab === "left") navigate("/profile");
-    else if (tab === "right") navigate("/hire");
+    setTimeout(() => {
+      if (tab === "left") {
+        navigate("/profile");
+      } else if (tab === "right") {
+        navigate("/hire/hrprofile");
+      }
+    }, 500);
   };
 
   return (
@@ -29,7 +34,7 @@ const Navbar = () => {
         scrolled ? "breathing-effect" : ""
       }`}
     >
-      <div className="flex items-center justify-between px-6 py-3">
+      <div className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-3">
           <button
             className="md:hidden text-white"
@@ -77,7 +82,8 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-6">
-          <div className="relative flex w-40 rounded-full bg-white overflow-hidden h-9 border-2 border-blue-600">
+          {/* Add hidden md:flex to show only on medium screens and above */}
+          <div className="relative hidden md:flex w-40 rounded-full bg-white overflow-hidden h-9 border-2 border-blue-600">
             <div
               className={`absolute top-0 bottom-0 left-[-2px] w-[calc(52%)] bg-gradient-to-r from-blue-600 to-blue-500 rounded-full transition-transform duration-300 ${
                 activeTab === "right" ? "translate-x-full" : "translate-x-0"

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Home,
   Calendar,
@@ -14,7 +14,6 @@ import MobileSidebarContent from "../sideBar/MobileSidebarContent";
 import DesktopSidebarContent from "../sideBar/DesktopSidebarContent";
 import { useNotifications } from "../../contexts/NotificationContext";
 import { Link, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 
 export const navItems = [
   {
@@ -34,7 +33,7 @@ export const navItems = [
   },
   {
     icon: <Briefcase />,
-    label: "Jobs Applied",
+    label: "Job Applied",
     path: "/applied-jobs",
   },
 ];
@@ -42,25 +41,21 @@ export const navItems = [
 const Header = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [showScheduleFromNotifications, setShowScheduleFromNotifications] =
+    useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
 
   const { notifications, markAsRead, markAllAsRead } = useNotifications();
+
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) setScrolled(true);
-      else setScrolled(false);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const handleViewAllNotifications = () => {
+    setNotificationsOpen(false);
+    setShowScheduleFromNotifications(true);
+  };
 
   const handleLogout = () => {
-    Cookies.remove("jwtToken");
-    Cookies.remove("userDetails");
     console.log("User logged out");
     navigate("/login");
   };
@@ -78,19 +73,29 @@ const Header = () => {
   return (
     <header className="relative">
       {/* Mobile Header */}
-      <div
-        className={`md:hidden fixed top-0 left-0 right-0 z-50 bg-[#0F52BA] text-white py-3 px-4 flex justify-between items-center shadow-md transition-shadow duration-300 ${
-          scrolled ? "breathing-effect" : ""
-        }`}
-      >
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-full hover:bg-[#1565C0] transition-colors"
-        >
-          <Menu size={20} />
-        </button>
-        <h1 className="text-2xl font-bold text-center pl-10">VOAT</h1>
-        <div className="flex items-center space-x-2">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[#0F52BA] text-white py-3 px-4 flex justify-between items-center shadow-md">
+        {/* Left side - menu and home */}
+        <div className="flex items-center space-x-2 w-1/3">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 rounded-full hover:bg-[#1565C0] transition-colors"
+          >
+            <Menu size={20} />
+          </button>
+          <Link
+            to="/"
+            className="flex items-center bg-[#0D47A1] rounded-full px-4 py-2 hover:bg-[#1565C0] transition-colors cursor-pointer"
+          >
+            <Home size={20} />
+
+          </Link>
+        </div>
+
+        {/* Centered VOAT title */}
+        <h1 className="text-xl font-bold mx-auto w-1/3 text-center">VOAT</h1>
+
+        {/* Right side - notifications and logout */}
+        <div className="flex items-center space-x-2 justify-end w-1/3">
           <div className="relative">
             <button
               onClick={() => setNotificationsOpen(!notificationsOpen)}
@@ -138,7 +143,7 @@ const Header = () => {
                 <div className="p-2 text-center border-t border-gray-200">
                   <Link
                     to="/schedule"
-                    onClick={() => setNotificationsOpen(false)}
+                    onClick={handleViewAllNotifications}
                     className="text-sm text-[#0F52BA] hover:underline"
                   >
                     View all notifications
@@ -179,28 +184,24 @@ const Header = () => {
       </div>
 
       {/* Desktop Header */}
-      <div
-        className={`absolute top-0 left-0 right-0 w-screen hidden md:flex bg-[#0F52BA] text-white py-4 px-6 justify-between items-center shadow-md z-40 transition-shadow duration-300 ${
-          scrolled ? "breathing-effect" : ""
-        }`}
-      >
-        <Link
-          to="/"
-          className="flex items-center space-x-2 bg-[#0D47A1] rounded-full px-4 py-2 hover:bg-[#1565C0] transition-colors cursor-pointer"
-        >
-          <Home size={20} />
-          <span className="font-medium">HOME</span>
-        </Link>
-
-        <h1 className="text-2xl font-bold text-center flex-1">
+      <div className="absolute top-0 left-0 right-0 w-screen hidden md:flex bg-[#0F52BA] text-white py-4 px-6 justify-between items-center shadow-md z-40">
+        {/* Left spacer */}
+        <div className="flex-1 flex items-center">
           <Link
-            to="/profile"
-            className="flex items-center justify-center flex-1"
+            to="/"
+            className="flex items-center space-x-2 bg-[#0D47A1] rounded-full px-4 py-2 hover:bg-[#1565C0] transition-colors cursor-pointer"
           >
-            VOAT
+            <Home size={20} />
+            <span className="font-medium">HOME</span>
           </Link>
-        </h1>
+        </div>
 
+        {/* Centered VOAT title */}
+        <div className="absolute left-1/2 transform -translate-x-1/2">
+          <h1 className="text-2xl font-bold">VOAT</h1>
+        </div>
+
+        {/* Right side icons */}
         <div className="flex items-center space-x-4">
           <div className="relative">
             <button
@@ -209,7 +210,7 @@ const Header = () => {
             >
               {unreadCount > 0 ? <BellDot size={20} /> : <Bell size={20} />}
               {unreadCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {unreadCount}
                 </span>
               )}
@@ -249,7 +250,7 @@ const Header = () => {
                 <div className="p-2 text-center border-t border-gray-200">
                   <Link
                     to="/schedule"
-                    onClick={() => setNotificationsOpen(false)}
+                    onClick={handleViewAllNotifications}
                     className="text-sm text-[#0F52BA] hover:underline"
                   >
                     View all notifications
@@ -291,7 +292,7 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Sidebar for Mobile */}
+      {/* Mobile Sidebar */}
       {sidebarOpen && (
         <div className="fixed inset-0 md:hidden z-50">
           <div
@@ -312,7 +313,7 @@ const Header = () => {
         </div>
       )}
 
-      {/* Sidebar for Desktop */}
+      {/* Desktop Sidebar */}
       <aside className="hidden h-screen md:flex w-64 bg-white shadow-lg flex-col pt-20">
         <DesktopSidebarContent />
       </aside>

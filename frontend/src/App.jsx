@@ -28,7 +28,8 @@ import Navbar from "./Landing/components/Navbar";
 import ChangePassword from "./studentsComponents/components/ChangePassword";
 import CustomCursor from "./components/CustomCursor";
 import StudentEmailOtp from "./studentsComponents/components/StudentEmailOtp";
-import { Toaster } from "react-hot-toast";
+import JobSearchPage from "./Landing/pages/JobSearchPage";
+import { Toaster } from 'react-hot-toast';
 
 import "./App.css";
 
@@ -58,10 +59,11 @@ function App() {
 
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<MainPages />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/" element={<MainPages />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/jobs/search" element={<JobSearchPage />} />
 
         {/* HR Dashboard Routes */}
         <Route path="/hire" element={<Layout />}>
@@ -99,7 +101,7 @@ function App() {
           }
         />
         <Route
-          path="/reset-password"
+          path="/ChangePassword"
           element={
             <StudentLayout>
               <ChangePassword />
